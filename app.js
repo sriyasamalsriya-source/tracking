@@ -48,12 +48,20 @@ async function showTrackingResult(value) {
     if (!Array.isArray(shipment.events)) {
       throw new Error("The shipment record has an invalid events list.");
     }
+    if (typeof shipment.recipientName !== "string" || !shipment.recipientName.trim()) {
+      throw new Error("The shipment record has an invalid recipient name.");
+    }
 
     trackingResult.replaceChildren();
     const latestStatus = shipment.events.at(-1)?.status || "No updates yet";
     const titleElement = addResultText(trackingResult, "div", "result-title", latestStatus);
     addResultText(titleElement, "span", "", "TRACKING UPDATES");
     addResultText(trackingResult, "div", "result-route", trackingNumber);
+    const recipient = document.createElement("div");
+    recipient.className = "result-recipient";
+    addResultText(recipient, "span", "result-recipient-label", "RECIPIENT");
+    addResultText(recipient, "strong", "result-recipient-name", shipment.recipientName.trim());
+    trackingResult.append(recipient);
 
     if (shipment.events.length === 0) {
       addResultText(trackingResult, "p", "result-route", "No shipment updates have been posted yet.");
